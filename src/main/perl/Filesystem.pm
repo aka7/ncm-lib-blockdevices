@@ -204,7 +204,12 @@ sub check_in_fstab
             $ndevice = "LABEL=$self->{label}";
         } else {
             my $uuid = $self->{block_device}->get_uuid('');
-            $ndevice = ($uuid) ? "UUID=$uuid" : $self->{block_device}->devpath;
+            if (ref($self->{block_device}) eq 'NCM::VXVM') {
+                $self->verbose("vol is blessed with NCM::VXVM. Not using uuid, using devpath");
+                $ndevice = $self->{block_device}->devpath;
+            } else {
+                 $ndevice = ($uuid) ? "UUID=$uuid" : $self->{block_device}->devpath;
+            }
         }
     } else {
         if ($protected && $protected->{mounts}->{$self->{mountpoint}}){
